@@ -23,10 +23,12 @@ const Participant = ({
       .filter((track) => track !== null);
 
   useEffect(() => {
+    console.log('Part Use Effect Called');
     setVideoTracks(trackpubsToTracks(participant.videoTracks));
     setAudioTracks(trackpubsToTracks(participant.audioTracks));
 
     const trackSubscribed = (track) => {
+      console.log('Tracks Sub');
       if (track.kind === "video") {
         setVideoTracks((videoTracks) => [...videoTracks, track]);
       } else {
@@ -35,6 +37,7 @@ const Participant = ({
     };
 
     const trackUnsubscribed = (track) => {
+      console.log('tracks Unsub');
       if (track.kind === "video") {
         setVideoTracks((videoTracks) => videoTracks.filter((v) => v !== track));
       } else {
@@ -45,6 +48,8 @@ const Participant = ({
     participant.on("trackSubscribed", trackSubscribed);
     participant.on("trackUnsubscribed", trackUnsubscribed);
 
+    
+
     return () => {
       setVideoTracks([]);
       setAudioTracks([]);
@@ -52,7 +57,9 @@ const Participant = ({
     };
   }, [participant]);
 
+
   useEffect(() => {
+    console.log('Video Tracks attached called ',videoTracks);
     const videoTrack = videoTracks[0];
     if (videoTrack) {
       videoTrack.attach(videoRef.current);
@@ -63,6 +70,7 @@ const Participant = ({
   }, [videoTracks]);
 
   useEffect(() => {
+    console.log('Audio Tracks attached called ',audioTracks);
     const audioTrack = audioTracks[0];
     if (audioTrack) {
       audioTrack.attach(audioRef.current);
@@ -75,7 +83,7 @@ const Participant = ({
   return (
     <div className="participant" style={{ position: "relative" }}>
       <h3>{participant.identity}</h3>
-      <video ref={videoRef} autoPlay={true} />
+      <video id="localVideo" ref={videoRef} autoPlay={true} />
       <audio ref={audioRef} autoPlay={true}  />
       {isLocal && (
         <Controls

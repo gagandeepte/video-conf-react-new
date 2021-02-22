@@ -61,14 +61,25 @@ const Room = ({ roomName, token, handleLogout }) => {
   };
 
   const handleVideoToggle = () => {
+    console.log(room.localParticipant.videoTracks);
     room.localParticipant.videoTracks.forEach(track => {
-      if (track.track.isEnabled) {
-        track.track.disable();
+      if (toggleVideo) {
+        //room.localParticipant.unpublishTrack(track.track);
+        track.track.stop();
+        //track.unpublish();
       } else {
-        track.track.enable();
+      const { createLocalVideoTrack } = require('twilio-video');
+
+      createLocalVideoTrack().then(localVideoTrack => {
+        room.localParticipant.unpublishTrack(track.track);
+        return room.localParticipant.publishTrack(localVideoTrack);
+      }).then(publication => {
+        console.log('Successfully unmuted your video:', publication.track);
+        publication.track.attach(document.getElementById("localVideo"));
+      });
       }
-      setToggleVideo(track.track.isEnabled);
     });
+    setToggleVideo(!toggleVideo);
   };
 
   const remoteParticipants = participants.map((participant) => (
